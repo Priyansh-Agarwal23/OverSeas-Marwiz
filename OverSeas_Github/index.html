@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Background Selector</title>
+    <link rel="icon" href="favicon.jpg" type="image/x-icon" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <style>
+         /* CSS for the image container and images */
+    body {
+      margin: 0;
+      padding: 0;
+      flex-direction: column;
+      /* justify-content: space-between; */
+      background-color: #f1f1f1;
+      background-image: url("filter_bg.avif");
+      background-size: cover;
+
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255,
+          255,
+          255,
+          0.508);
+      /* Adjust the opacity value here */
+      z-index: -2;
+    }
+
+    #image-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* border: 1px solid red; */
+      width: 1000px;
+      /* Adjust the container width as needed */
+      height: 500px;
+      /* overflow: hidden; */
+    }
+
+    .image {
+      opacity: 0.3;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      height: 100%;
+      transition: opacity 0.5s ease;
+      width: 180px;
+      height: auto;
+      border-radius: 50%;
+      overflow: initial;
+      z-index: 0;
+      margin-right: 10px;
+    }
+
+    .image.center {
+      opacity: 1;
+      border-radius: 50%;
+      width: 250px;
+      z-index: 1;
+    }
+
+
+    .image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image button {
+      width: 250px;
+      height: 250px;
+      border: none;
+      border-radius: 50%;
+      /* Make the buttons round */
+      overflow: hidden;
+      /* Hide any overflowing content within the rounded shape */
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgb(243, 243, 219);
+    }
+
+    .image button.active {
+      border: 5px solid rgb(0, 0, 0);
+    }
+
+    .image img {
+      width: 150px;
+      height: 175px;
+      object-fit: contain;
+    }
+
+    .timer-container {
+      text-align: center;
+      margin-bottom: 100px;
+    }
+
+    #timer {
+      font-family: "Arial", sans-serif;
+      font-size: 70px;
+      font-weight: bold;
+      color: #333333;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .capture-button {
+      font-family: "Arial", sans-serif;
+      font-size: 60px;
+      font-weight: bold;
+      padding: 20px 40px;
+      border-radius: 10px;
+      background-color: #002244;
+      /* Dark navy blue */
+      color: white;
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      margin-top: 50px;
+    }
+
+    .download-button {
+      font-family: "Arial", sans-serif;
+      font-size: 60px;
+      font-weight: bold;
+      padding: 20px 40px;
+      border-radius: 10px;
+      background-color: #002244;
+      /* Dark navy blue */
+      color: white;
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      margin-top: 50px;
+    }
+
+    #image-container {
+      position: relative;
+    }
+
+    #capture-msg,
+    #experience-msg {
+      font-family: "Arial", sans-serif;
+      font-size: 40px;
+      font-weight: bold;
+      color: #002244;
+      /* Dark navy blue */
+      text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+      visibility: hidden;
+      animation: fadeinout 20s forwards;
+      animation-delay: 1s;
+      margin-top: 20px;
+      /* Adjust the margin-top as needed */
+    }
+
+    @keyframes fadeinout {
+      0% {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      10% {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      90% {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      100% {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .image {
+      flex: 0 0 20%;
+      padding: 10px;
+      box-sizing: border-box;
+      /* Additional styling for the image element */
+    }
+
+    /* footer {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: right;
+      } */
+    </style>
+  </head>
+
+  <body>
+    <div class="timer-container" style="margin-bottom: 300px">
+      <h1 id="timer">Loading...</h1>
+      <div id="end-msg"></div>
+    </div>
+
+    <div id="image-container">
+      <div class="image img2" data-filter-id="0">
+        <button>
+          <img src="bg_3.jpg" alt="Image 4">
+        </button>
+      </div>
+      <div class="image img2" data-filter-id="2">
+        <button>
+          <img src="Britain.png" alt="Image 2">
+        </button>
+      </div>
+      <div class="image center img1" data-filter-id="4">
+        <button class="active">
+          <img src="America.png" alt="Image 1">
+        </button>
+      </div>
+      <div class="image img3" data-filter-id="3">
+        <button>
+          <img src="Canada.png" alt="Image 3">
+        </button>
+      </div>
+    </div>
+
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 250px;
+        margin-bottom: 20px;
+      "
+    >
+    <button class="capture-button" onclick="captureImage()">Capture</button>
+    <div id="capture-msg"></div>
+    <div id="experience-msg"></div>
+    <button class="download-button" style="display: none">⬇ Download</button>
+
+    <script>
+      
+      //Download button javascript
+          var downloadButton = document.querySelector(".download-button");
+      
+      downloadButton.addEventListener("click", function () {
+
+        makeImageActive(0);
+        // Call the API to fetch the latest image filename
+        fetch("http://localhost:3000/api/images/:fileName", {
+          method: "GET",
+        })
+          .then((response) => {
+            if (response.ok) {
+              console.log("Latest image filename API called successfully");
+              // Return the filename from the API response
+              return response.text();
+            } else {
+              console.error("Failed to call the Latest image filename API");
+              // Display error message or handle the error
+              throw new Error("Latest image filename API failed");
+            }
+          })
+          .then((filename) => {
+            // Call the API to download the image with the obtained filename
+            fetch(`http://localhost:3000/api/images/:filename`, {
+              method: "GET",
+            })
+              .then((response) => {
+                if (response.ok) {
+                  console.log("Image download API called successfully");
+                  // Perform any necessary actions after successful download
+                  return response.blob();
+                } else {
+                  console.error("Failed to call the Image download API");
+                  // Display error message or handle the error
+                  throw new Error("Image download API failed");
+                }
+              })
+              .then((blob) => {
+                // Create a temporary download link
+                var downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+      
+                // Set the download filename with the desired format
+                downloadLink.download = getDownloadFilename(filename);
+      
+                downloadLink.click();
+              })
+              .catch((error) => {
+                console.error("Error calling the Image download API:", error);
+                // Display error message or handle the error
+              });
+          })
+          .catch((error) => {
+            console.error("Error calling the Latest image filename API:", error);
+            // Display error message or handle the error
+          });
+      });
+      
+      function getDownloadFilename(filename) {
+        // Get the file extension from the filename
+        var extension = filename.split(".").pop().toLowerCase();
+      
+        // Set the desired download format (PNG or JPG)
+        var format = "jpg"; // Change this to 'jpg' if you want JPG format
+      
+        // Create the download filename with the desired format
+        // var downloadFilename = filename.replace(extension, format);
+      
+        // return downloadFilename;
+      
+        var fileName = "marwiz_bg";
+        return fileName;
+      }
+          </script>
+    
+
+
+
+    <!-- <footer>
+      <p>Powered By Marwiz Tech Pvt. Ltd.</p>
+      <p>&copy; All rights reserved.</p>
+    </footer> -->
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+
+  <script>
+        //Time functionality javascript
+        var seconds = 120;
+    var countdown = setInterval(function () {
+      var timerElement = document.getElementById("timer");
+      timerElement.innerText = formatTime(seconds);
+
+      if (seconds <= 30) {
+        timerElement.style.color = "#fe0000";
+        timerElement.style.textShadow = "3px 3px 6px rgba(0, 0, 0, 0.5)";
+      }
+
+      if (seconds <= 0) {
+        clearInterval(countdown);
+        timerElement.innerText = "Time up! 😔";
+        timerElement.style.color = "black";
+        timerElement.style.textShadow = "none";
+        var endMsgElement = document.getElementById("end-msg");
+        endMsgElement.innerHTML = "Please try again!";
+        endMsgElement.style.fontFamily = "Arial, sans-serif";
+        endMsgElement.style.fontSize = "60px";
+        endMsgElement.style.fontWeight = "bold";
+        endMsgElement.style.color = "#333333";
+        endMsgElement.style.textShadow = "3px 3px 6px rgba(0, 0, 0, 0.5)";
+      }
+      seconds--;
+    }, 1000);
+  </script>
+
+  <script>
+
+//Javascript for loading images from backend
+const filterContainer = document.getElementById('image-container');
+  const maxImages = 8;
+
+  fetch('http://localhost:3000/api/images')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch images');
+      }
+      return response.json();
+    })
+    .then(imageUrls => {
+      if (imageUrls.length > maxImages) {
+        imageUrls = imageUrls.slice(imageUrls.length - maxImages);
+      }
+
+      while (filterContainer.firstChild) {
+        filterContainer.removeChild(filterContainer.firstChild);
+      }
+
+      imageUrls.forEach((imageUrl, index) => {
+        const imageDiv = document.createElement('div');
+        imageDiv.className = `image img${index}`;
+        imageDiv.setAttribute('data-filter-id', index + 1);
+
+        const button = document.createElement('button');
+        button.addEventListener('click', () => {
+          makeImageActive(index);
+        });
+
+        const filterImage = document.createElement('img');
+        filterImage.src = `http://localhost:3000/${imageUrl}`;
+        filterImage.alt = 'Image';
+
+        button.appendChild(filterImage);
+        imageDiv.appendChild(button);
+        filterContainer.appendChild(imageDiv);
+
+        // Set the first image as the default active image
+        if (index === 0) {
+          imageDiv.classList.add('active');
+          makeImageActive(index);
+        }
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching images:', error);
+      // Handle the error case, e.g., display an error message on the page
+    });
+
+
+    // JavaScript for image swiping
+
+
+ const container = document.getElementById("image-container");
+
+  function makeImageActive(index) {
+    const images = Array.from(container.getElementsByClassName("image"));
+    const numImages = images.length;
+
+    for (let i = 0; i < numImages; i++) {
+      images[i].classList.remove("center");
+      images[i].querySelector("button").classList.remove("active");
+      images[i].style.zIndex = 0; // Reset the z-index of all images
+    }
+    images[index].classList.add("center");
+    images[index].querySelector("button").classList.add("active");
+    images[index].style.zIndex = 1; // Set the z-index of the center image
+
+    // Call the API based on the selected filterId
+    const filterId = images[index].dataset.filterId;
+    const deviceId = "111"; // Replace with the actual device ID
+    callFilterAPI(deviceId, filterId);
+  }
+
+
+  // Click event listener to make an image active when clicked
+  container.addEventListener("click", function (event) {
+    const clickedImage = event.target.closest(".image");
+    if (clickedImage) {
+      const images = Array.from(container.getElementsByClassName("image"));
+      const index = images.indexOf(clickedImage);
+      makeImageActive(index);
+    }
+  });
+
+ // Swipe functionality
+ container.addEventListener("touchstart", handleTouchStart, false);
+  container.addEventListener("touchmove", handleTouchMove, false);
+
+  let xDown = null;
+  let yDown = null;
+
+  function handleTouchStart(event) {
+    const firstTouch = event.touches[0];
+    xDown = firstTouch.clientX;
+    yDown = firstTouch.clientY;
+  }
+
+  function handleTouchMove(event) {
+    if (!xDown || !yDown) {
+      return;
+    }
+
+    const xUp = event.touches[0].clientX;
+    const yUp = event.touches[0].clientY;
+
+    const xDiff = xDown - xUp;
+    const yDiff = yDown - yUp;
+
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      if (xDiff > 0) {
+        swipeImage("left");
+      } else {
+        swipeImage("right");
+      }
+    }
+
+    xDown = null;
+    yDown = null;
+  }
+
+    // Function to call the filter API
+    function callFilterAPI(deviceId, filterId) {
+    // Replace with your code to call the backend API and handle the response
+    console.log(`Calling API for deviceId: ${deviceId} and filterId: ${filterId}`);
+  }
+
+  // Initial setup
+  makeImageActive(0);
+
+  function swipeImage(direction) {
+    const images = Array.from(container.getElementsByClassName("image"));
+    const numImages = images.length;
+
+    let centerIndex = images.findIndex(image =>
+      image.classList.contains("center")
+    );
+
+    images[centerIndex].classList.remove("center");
+    images[centerIndex].querySelector("button").classList.remove("active");
+    images[centerIndex].style.zIndex = 0; // Reset the z-index of the current center image
+
+    if (direction === "left") {
+      centerIndex = (centerIndex + 1) % numImages;
+    } else {
+      centerIndex = (centerIndex - 1 + numImages) % numImages;
+    }
+
+    images[centerIndex].classList.add("center");
+    images[centerIndex].querySelector("button").classList.add("active");
+    images[centerIndex].style.zIndex = 1; // Set the z-index of the new center image
+
+    // Call the API based on the selected filterId
+    const filterId = images[centerIndex].dataset.filterId;
+    const deviceId = "111"; // Replace with the actual device ID
+    callFilterAPI(deviceId, filterId);
+  }
+
+  // //Download button javascript
+  //   var downloadButton = document.querySelector(".download-button");
+
+  //   downloadButton.addEventListener("click", function () {
+  //     // Call the API to fetch the latest image filename
+  //     fetch("http://20.204.100.126:3000/api/images/:fileName", {
+  //       method: "GET",
+  //     })
+  //       .then((response) => {
+  //         if (response.ok) {
+  //           console.log("Latest image filename API called successfully");
+  //           // Return the filename from the API response
+  //           return response.text();
+  //         } else {
+  //           console.error("Failed to call the Latest image filename API");
+  //           // Display error message or handle the error
+  //           throw new Error("Latest image filename API failed");
+  //         }
+  //       })
+  //       .then((filename) => {
+  //         // Call the API to download the image with the obtained filename
+  //         fetch(`http://20.204.100.126:3000/api/images/:filename`, {
+  //           method: "GET",
+  //         })
+  //           .then((response) => {
+  //             if (response.ok) {
+  //               console.log("Image download API called successfully");
+  //               // Perform any necessary actions after successful download
+  //               return response.blob();
+  //             } else {
+  //               console.error("Failed to call the Image download API");
+  //               // Display error message or handle the error
+  //               throw new Error("Image download API failed");
+  //             }
+  //           })
+  //           .then((blob) => {
+  //             // Create a temporary download link
+  //             var downloadLink = document.createElement("a");
+  //             downloadLink.href = URL.createObjectURL(blob);
+
+  //             // Set the download filename with the desired format
+  //             downloadLink.download = getDownloadFilename(filename);
+
+  //             downloadLink.click();
+  //           })
+  //           .catch((error) => {
+  //             console.error("Error calling the Image download API:", error);
+  //             // Display error message or handle the error
+  //           });
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error calling the Latest image filename API:", error);
+  //         // Display error message or handle the error
+  //       });
+  //   });
+
+  //   function getDownloadFilename(filename) {
+  //     // Get the file extension from the filename
+  //     var extension = filename.split(".").pop().toLowerCase();
+
+  //     // Set the desired download format (PNG or JPG)
+  //     var format = "png"; // Change this to 'jpg' if you want JPG format
+
+  //     // Create the download filename with the desired format
+  //     // var downloadFilename = filename.replace(extension, format);
+
+  //     // return downloadFilename;
+
+  //     var fileName = "marwiz_filter";
+  //     return fileName;
+  //   }
+
+    function callFilterAPI(deviceId, filterId) {
+      // Make a request to the backend API
+      fetch(`http://localhost:3000/api/filter/${deviceId}/${filterId}`)
+        .then((response) => {
+          if (response.ok) {
+            console.log(
+              `Filter API called for deviceId: ${deviceId}, filterId: ${filterId}`
+            );
+          } else {
+            console.error("Failed to call the Filter API");
+          }
+        })
+        .catch((error) => {
+          console.error("Error calling the Filter API:", error);
+        });
+    }
+
+    function formatTime(seconds) {
+      var minutes = Math.floor(seconds / 60);
+      var remainingSeconds = seconds % 60;
+      return (
+        minutes.toString().padStart(2, "0") +
+        ":" +
+        remainingSeconds.toString().padStart(2, "0")
+      );
+    }
+
+    function captureImage() {
+      var captureButton = document.querySelector(".capture-button");
+      const downloadButton = document.querySelector(".download-button");
+      downloadButton.style.display = "block";
+      captureButton.disabled = true;
+
+      var captureMsg = document.getElementById("capture-msg");
+      var experienceMsg = document.getElementById("experience-msg");
+
+      captureMsg.innerHTML = "Image capture in progress... 🎞 ";
+      captureMsg.style.visibility = "visible";
+
+      // Call the API to capture the image
+      const deviceId = "111"; // Replace with the actual device ID
+      fetch(`http://localhost:3000/api/take_picture/${deviceId}`)
+        .then((response) => {
+          if (response.ok) {
+            console.log("Image capture API called successfully");
+            // Wait for 3 seconds before hiding the capture message
+            setTimeout(function () {
+              captureMsg.style.animation = "fadeout 1s forwards";
+              // Wait for the fadeout animation to complete before hiding the capture message
+              setTimeout(function () {
+                captureMsg.style.visibility = "hidden";
+              }, 1000);
+              experienceMsg.innerHTML =
+                "Image captured successfully  ✔ <br>Hope you had a great experience 😃";
+              experienceMsg.style.visibility = "visible";
+              experienceMsg.style.animation = "fadeinout 20s forwards";
+            }, 3000);
+          } else {
+            console.error("Failed to call the Image capture API");
+            // Display error message
+            captureMsg.style.animation = "fadeout 1s forwards";
+            // Wait for the fadeout animation to complete before hiding the capture message
+            setTimeout(function () {
+              captureMsg.style.visibility = "hidden";
+            }, 1000);
+            experienceMsg.innerHTML =
+              "Failed to capture image. Please try again.";
+            experienceMsg.style.visibility = "visible";
+            experienceMsg.style.animation = "fadeinout 20s forwards";
+          }
+        })
+        .catch((error) => {
+          console.error("Error calling the Image capture API:", error);
+          // Display error message
+          captureMsg.style.animation = "fadeout 1s forwards";
+          // Wait for the fadeout animation to complete before hiding the capture message
+          setTimeout(function () {
+            captureMsg.style.visibility = "hidden";
+          }, 1000);
+          experienceMsg.innerHTML =
+            "Failed to capture image. Please try again.";
+          experienceMsg.style.visibility = "visible";
+          experienceMsg.style.animation = "fadeinout 20s forwards";
+        })
+        .finally(() => {
+          setTimeout(function () {
+            experienceMsg.style.visibility = "hidden";
+            experienceMsg.style.animation = "";
+            captureButton.disabled = false;
+          }, 5000);
+        });
+    }
+  </script>
+</html>
